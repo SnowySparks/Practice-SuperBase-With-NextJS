@@ -4,7 +4,8 @@ import Header from "@/components/header";
 import NewNote from "@/components/new-note";
 import NoteViewer from "@/components/note-viewer";
 import Sidebar from "@/components/sidebar";
-import { useState } from "react";
+import { supabase } from "@/utils/supabase";
+import { useEffect, useState } from "react";
 const notes = [
   {
     id: 1,
@@ -20,6 +21,11 @@ const notes = [
 export default function Home() {
   const [activeNoteId, setActiveNoteId] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
+
+  useEffect(() => {
+    supabase.from("note").select("*").then(console.log);
+  }, []);
+
   return (
     <main className="w-full h-screen flex flex-col">
       <Header />
