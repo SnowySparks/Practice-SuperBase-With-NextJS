@@ -13,6 +13,12 @@ export default function Sidebar({
       >
         ➕ 새로운 노트
       </button>
+
+      <input
+        className="w-full p-2 border rounded-md border-gray-600 mt-2"
+        placeholder="노트를 검색해 보세요"
+        type="text"
+      />
       <ul className="mt-2 flex flex-col gap-2">
         {notes.map((note) => (
           <li key={note.id}>

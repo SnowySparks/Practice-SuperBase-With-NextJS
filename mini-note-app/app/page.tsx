@@ -4,26 +4,28 @@ import Header from "@/components/header";
 import NewNote from "@/components/new-note";
 import NoteViewer from "@/components/note-viewer";
 import Sidebar from "@/components/sidebar";
+import { Database } from "@/types_db";
 import { supabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
-const notes = [
-  {
-    id: 1,
-    title: "노트 1",
-    content: "노트 내용입니다 1",
-  },
-  {
-    id: 2,
-    title: "노트 2",
-    content: "노트 내용입니다 2",
-  },
-];
+
 export default function Home() {
   const [activeNoteId, setActiveNoteId] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [notes, setNotes] = useState<
+    Database["public"]["Tables"]["note"]["Row"][]
+  >([]);
+
+  // supabase의 DB를 가져오는 함수
+  const fetchNotes = async () => {
+    const { data, error } = await supabase.from("note").select("*");
+    if (error) {
+      alert(error.message);
+    }
+    setNotes(data || []);
+  };
 
   useEffect(() => {
-    supabase.from("note").select("*").then(console.log);
+    fetchNotes();
   }, []);
 
   return (
@@ -37,9 +39,17 @@ export default function Home() {
           notes={notes}
         />
         {isCreating ? (
-          <NewNote setIsCreating={setIsCreating} />
+          <NewNote
+            setActiveNoteId={setActiveNoteId}
+            fetchNotes={fetchNotes}
+            setIsCreating={setIsCreating}
+          />
         ) : activeNoteId ? (
-          <NoteViewer note={notes.find((note) => note.id === activeNoteId)} />
+          <NoteViewer
+            fetchNotes={fetchNotes}
+            setActiveNoteId={setActiveNoteId}
+            note={notes.find((note) => note.id === activeNoteId)}
+          />
         ) : (
           <EmptyNote />
         )}

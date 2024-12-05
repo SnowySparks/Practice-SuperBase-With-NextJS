@@ -1,7 +1,10 @@
 "use client";
+import { supabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 export default function NoteViewer({
   note, // {id: 1, title: "", content: ""}
+  setActiveNoteId,
+  fetchNotes,
 }) {
   const [title, setTitle] = useState(note?.title);
   const [content, setContent] = useState(note?.content);
@@ -11,6 +14,34 @@ export default function NoteViewer({
     setContent(note?.content);
     setIsEditing(false);
   }, [note]);
+
+  // 수정
+  const onEdit = async () => {
+    // update 쿼리문
+    const { error } = await supabase
+      .from("note")
+      .update({
+        title,
+        content,
+      })
+      .eq("id", note.id);
+
+    if (error) {
+      alert(error.message);
+    }
+  };
+  const onDelete = async () => {
+    // delete 쿼리문
+    const { error } = await supabase.from("note").delete().eq("id", note.id);
+
+    if (error) {
+      alert(error.message);
+    }
+    setIsEditing(false);
+    fetchNotes();
+    setActiveNoteId(null);
+  };
+
   return (
     <div className="w-2/3 p-2 flex flex-col gap-2 absolute top-0 bottom-0 right-0">
       {isEditing ? (
@@ -39,10 +70,16 @@ export default function NoteViewer({
       <div className="w-full flex justify-end gap-2">
         {isEditing ? (
           <>
-            <button className="py-1 px-3 rounded-full border-2 border-green-600 hover:bg-green-200 transition-all duration-300 ease-in-out">
+            <button
+              onClick={() => onEdit}
+              className="py-1 px-3 rounded-full border-2 border-green-600 hover:bg-green-200 transition-all duration-300 ease-in-out"
+            >
               저장
             </button>
-            <button className="py-1 px-3 rounded-full border-2 border-red-600 hover:bg-red-200 transition-all duration-300 ease-in-out">
+            <button
+              onClick={() => onDelete()}
+              className="py-1 px-3 rounded-full border-2 border-red-600 hover:bg-red-200 transition-all duration-300 ease-in-out"
+            >
               삭제
             </button>
           </>
