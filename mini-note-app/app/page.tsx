@@ -15,9 +15,14 @@ export default function Home() {
     Database["public"]["Tables"]["note"]["Row"][]
   >([]);
 
+  const [search, setSearch] = useState("");
+
   // supabase의 DB를 가져오는 함수
   const fetchNotes = async () => {
-    const { data, error } = await supabase.from("note").select("*");
+    const { data, error } = await supabase
+      .from("note")
+      .select("*")
+      .ilike("title", `%${search}%`);
     if (error) {
       alert(error.message);
     }
@@ -28,6 +33,10 @@ export default function Home() {
     fetchNotes();
   }, []);
 
+  useEffect(() => {
+    fetchNotes();
+  }, [search]);
+
   return (
     <main className="w-full h-screen flex flex-col">
       <Header />
@@ -36,6 +45,8 @@ export default function Home() {
           activeNoteId={activeNoteId}
           setActiveNoteId={setActiveNoteId}
           setIsCreating={setIsCreating}
+          search={search}
+          setSearch={setSearch}
           notes={notes}
         />
         {isCreating ? (
