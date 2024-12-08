@@ -7,6 +7,10 @@ import ReactQueryClientProvider from "config/ReactQueryClientProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase:
+    process.env.NODE_ENV === "production"
+      ? new URL(process.env.NEXT_PUBLIC_SERVICE_URL!)
+      : new URL("http://localhost:3000"),
   title: "Todo CRUD",
   description: "할 일 정하기",
   openGraph: {
