@@ -27,7 +27,14 @@ export default function RootLayout({
             referrerPolicy="no-referrer"
           />
         </head>
-        <body className={inter.className}>{children}</body>
+        <body
+          className={`${inter.className} w-2/3 mx-auto flex flex-col items-center py-10 gap-2`}
+        >
+          <header>
+            <h1 className="text-xl">TODO LIST</h1>
+          </header>
+          {children}
+        </body>
       </html>
     </ThemeProvider>
   );
