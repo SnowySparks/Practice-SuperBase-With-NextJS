@@ -26,7 +26,7 @@ export default function Todo({ todo }: TodoProps) {
     onSuccess: () => {
       setIsEditing(false);
       queryClient.invalidateQueries({
-        queryKey: ["todds"],
+        queryKey: ["todos"],
       });
     },
   });
@@ -35,7 +35,7 @@ export default function Todo({ todo }: TodoProps) {
     mutationFn: () => deleteTodo(todo),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["todds"],
+        queryKey: ["todos"],
       });
     },
   });
