@@ -14,8 +14,8 @@ const SearchComponent = ({
 }: SearchComponentProps) => {
   return (
     <Input
-      value={searchInput}
-      onChange={(e) => setSearchInput(e.target.value || "")}
+      value={searchInput || ""}
+      onChange={(e) => setSearchInput(e.target.value)}
       label="Search Image"
       placeholder="Search Image"
       icon={<i className="fas fa-search" />}

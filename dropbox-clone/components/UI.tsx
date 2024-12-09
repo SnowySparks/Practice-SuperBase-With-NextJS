@@ -6,7 +6,7 @@ import FileDrageDropZone from "./file-dragdropzone";
 import { DropBoxImageList } from "./dropbox-image-list";
 
 const UI = () => {
-  const [searchInput, setSearchInput] = useState("");
+  const [searchInput, setSearchInput] = useState<string>("");
   return (
     <main className="w-full p-2 flex flex-col gap-4">
       {/* logo */}
@@ -22,7 +22,7 @@ const UI = () => {
       <FileDrageDropZone />
 
       {/* dropbox image list */}
-      <DropBoxImageList />
+      <DropBoxImageList searchInput={searchInput} />
     </main>
   );
 };
