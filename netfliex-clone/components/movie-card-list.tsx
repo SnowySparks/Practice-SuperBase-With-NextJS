@@ -30,7 +30,10 @@ export default function MovieCardList() {
       getNextPageParam: (lastPage) => {
         // pageParma에 들어가는 다음 값을 리턴해주는 역할
         // 만약에 falsy가 리턴되면 더이상 데이터를 가져오지 않음 -> hasNextPage가 false가 됨
-        return lastPage.page ? lastPage.page + 1 : null;
+        if (lastPage.hasNext) {
+          return lastPage.page + 1;
+        }
+        return null;
       },
       retry: 0,
       refetchOnMount: false,
@@ -38,16 +41,12 @@ export default function MovieCardList() {
       refetchOnReconnect: false,
     });
 
+  // Intersection Observer에 감지가 되고 ,다음 페이지가 존재하며, 이전 페이지를 가져오는 중이 아니며, 데이터를 가져오는 중이 아닐 때
+  // 다음 페이지를 가져옴
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage && !isFetching) {
       console.log("fetching next page");
       fetchNextPage();
-    } else {
-      if (!hasNextPage) {
-        console.log("no more pages");
-      } else {
-        console.log("not in view");
-      }
     }
   }, [inView, hasNextPage]);
 
@@ -60,11 +59,11 @@ export default function MovieCardList() {
         <>
           {data?.pages
             ?.map((page) => page.data)
-            .flat()
+            .flat() // 2차원 배열을 1차원 배열로 만들어줌
             .map((movie) => (
               <MovieCard key={movie.id} movie={movie} />
             ))}
-          <div ref={ref}></div>
+          <div className="mb-14" ref={ref}></div>
         </>
       )}
     </div>

@@ -24,7 +24,6 @@ export const searchMovies = async ({
     .like("title", `%${search}%`)
     .range((page - 1) * pageSize, page * pageSize - 1);
   // range (start, end) -> [start, end] 범위의 데이터를 가져옴
-  console.log("searchMovies", { data, count, page, pageSize });
   if (error) {
     return {
       data: [],
@@ -32,13 +31,17 @@ export const searchMovies = async ({
       page: null,
       pageSize: null,
       error,
+      hasNext: false,
     };
   }
+
+  const hasNext = count > page * pageSize;
 
   return {
     data,
     page,
     pageSize,
+    hasNext,
   };
 };
 
