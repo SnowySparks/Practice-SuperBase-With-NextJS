@@ -4,11 +4,14 @@ import { Spinner } from "@material-tailwind/react";
 import MovieCard from "./movie-card";
 import { useQuery } from "@tanstack/react-query";
 import { searchMovies } from "actions/movieActions";
+import { useSearch } from "utils/store/searchText";
 
 export default function MovieCardList() {
+  const search = useSearch((state) => state.searchText);
+
   const getAllMoviesQuery = useQuery({
-    queryKey: ["movie"],
-    queryFn: () => searchMovies(),
+    queryKey: ["movie", search],
+    queryFn: () => searchMovies(search),
   });
 
   return (
