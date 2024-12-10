@@ -7,18 +7,39 @@ const handleError = (error: Error) => {
   throw new Error(error.message);
 };
 
-export const searchMovies = async (search = "") => {
+export const searchMovies = async ({
+  search,
+  page,
+  pageSize,
+}: {
+  search: string;
+  page: number;
+  pageSize: number;
+}) => {
   const supabase = await createServerSupabaseClient();
 
-  const { data, error } = await supabase
+  const { data, count, error } = await supabase // count : 전체 데이터 크기
     .from("movie")
-    .select("*")
-    .like("title", `%${search}%`);
-
+    .select("*", { count: "exact" })
+    .like("title", `%${search}%`)
+    .range((page - 1) * pageSize, page * pageSize - 1);
+  // range (start, end) -> [start, end] 범위의 데이터를 가져옴
+  console.log("searchMovies", { data, count, page, pageSize });
   if (error) {
-    handleError(error);
+    return {
+      data: [],
+      count: 0,
+      page: null,
+      pageSize: null,
+      error,
+    };
   }
-  return data;
+
+  return {
+    data,
+    page,
+    pageSize,
+  };
 };
 
 export const getMovie = async (id: number) => {
