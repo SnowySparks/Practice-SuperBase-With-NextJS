@@ -3,7 +3,7 @@
 import { Spinner } from "@material-tailwind/react";
 import { Button } from "@material-tailwind/react";
 import { useMutation } from "@tanstack/react-query";
-import { uploadFile } from "actions/storageActions";
+import { uploadFiles } from "actions/storageActions";
 import { queryClient } from "config/ReactQueryClientProvider";
 import React, { useCallback, useRef } from "react";
 import { useDropzone } from "react-dropzone";
@@ -14,7 +14,7 @@ const FileDrageDropZone = () => {
 
   // 업로드 파일 Mutation
   const uploadFileMutation = useMutation({
-    mutationFn: uploadFile,
+    mutationFn: uploadFiles,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["searchImages"],
@@ -28,14 +28,20 @@ const FileDrageDropZone = () => {
   // 파일 드래그 앤 드롭 이벤트가 일어 날 때 실행
   const onDrop = useCallback(async (acceptedFiles) => {
     // Do something with the files
-    const file = acceptedFiles?.[0];
-    if (file) {
+    if (acceptedFiles.length > 0) {
+      // 파일 업로드 Mutation 실행
       const formData = new FormData();
-      formData.append("file", file);
+      acceptedFiles.forEach((file) => {
+        formData.append(file.name, file);
+      });
+
       uploadFileMutation.mutate(formData);
     }
   }, []);
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    multiple: true,
+  });
 
   return (
     <div
