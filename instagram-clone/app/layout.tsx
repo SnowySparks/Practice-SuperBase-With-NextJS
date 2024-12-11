@@ -4,15 +4,21 @@ import { ThemeProvider } from "config/material-tailwind-theme-provider";
 import ReactQueryClientProvider from "config/ReactQueryClientProvider";
 import MainLayout from "components/layouts/main-layout";
 import Auth from "components/auth";
+import { createServerSupabaseClient } from "utils/supabase/server";
+import AuthProvider from "config/AuthProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const loggedIn = false;
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  console.log(session);
 
   return (
     <html lang="en">
@@ -28,7 +34,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <ReactQueryClientProvider>
           <ThemeProvider>
-            {loggedIn ? <MainLayout>{children}</MainLayout> : <Auth />}
+            <AuthProvider accessToken={session?.access_token}>
+              {session?.user ? <MainLayout>{children}</MainLayout> : <Auth />}
+            </AuthProvider>
           </ThemeProvider>
         </ReactQueryClientProvider>
       </body>

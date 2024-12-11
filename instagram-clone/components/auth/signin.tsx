@@ -1,8 +1,30 @@
 import { Button, Input } from "@material-tailwind/react";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { createBrowserSupabaseClient } from "utils/supabase/client";
+
 export default function SignIn({ setView }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const supabase = createBrowserSupabaseClient();
+
+  // 로그인과 관련된 Mutation
+  const signInMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) {
+        alert(error.message);
+      }
+      if (data) {
+        console.log(data);
+      }
+    },
+  });
+
   return (
     <div className="flex flex-col gap-4">
       <div className="pt-10 pb-6 px-10 w-full flex flex-col items-center justify-center max-w-lg border border-gray-400 bg-white gap-2">
@@ -23,8 +45,10 @@ export default function SignIn({ setView }) {
         />
         <Button
           onClick={() => {
-            console.log("signin");
+            signInMutation.mutate();
           }}
+          disabled={signInMutation.isPending}
+          loading={signInMutation.isPending}
           color="light-blue"
           className="w-full text-md py-1"
         >
