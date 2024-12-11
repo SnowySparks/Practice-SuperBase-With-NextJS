@@ -10,11 +10,12 @@ const compat = new FlatCompat({
 });
 
 export default [
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
-    ...compat.extends("next/core-web-vitals", "next/typescript"),
+    files: ["**/*.ts", "**/*.tsx"],
     rules: {
-      "typescript-eslint/no-unused-vars": "off",
-      "typescript-eslint/no-implicity-any": "warn",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "warn", // 경고로 설정
     },
   },
 ];
