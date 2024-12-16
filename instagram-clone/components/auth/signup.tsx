@@ -9,6 +9,7 @@ export default function SignUp({ setView }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmationRequired, setConfirmationRequired] = useState(false); // 회원가입은 성공했고 이메일 인증이 필요할 떄
+  const [otp, setOtp] = useState("");
 
   const supabase = createBrowserSupabaseClient();
 
@@ -36,34 +37,72 @@ export default function SignUp({ setView }) {
     },
   });
 
+  // 회원 인증 -> otp인증
+  const verifyOtpMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.auth.verifyOtp({
+        type: "signup",
+        email,
+        token: otp,
+      });
+    },
+  });
+
   return (
     <div className="flex flex-col gap-4">
       <div className="pt-10 pb-6 px-10 w-full flex flex-col items-center justify-center max-w-lg border border-gray-400 bg-white gap-2">
         <img src={"/images/inflearngram.webp"} className="w-60 mb-6" />
-        <Input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          label="email"
-          type="email"
-          className="w-full rounded-sm"
-        />
-        <Input
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          label="password"
-          type="password"
-          className="w-full rounded-sm"
-        />
+        {confirmationRequired ? (
+          <Input
+            value={otp}
+            onChange={(e) => {
+              setOtp(e.target.value);
+            }}
+            label="otp"
+            type="number"
+            className="w-full rounded-sm"
+            placeholder="이메일로 전송된 6자리 숫자를 입력해주세요."
+          />
+        ) : (
+          <>
+            <Input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              label="email"
+              type="email"
+              className="w-full rounded-sm"
+            />
+            <Input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              label="password"
+              type="password"
+              className="w-full rounded-sm"
+            />
+          </>
+        )}
         <Button
           onClick={() => {
-            signUpMutation.mutate();
+            if (confirmationRequired) {
+              verifyOtpMutation.mutate();
+            } else {
+              signUpMutation.mutate();
+            }
           }}
-          disabled={confirmationRequired} // -> 회원가입 성공 후 이메일 인증이 필요할 때 버튼 비활성화
-          loading={signUpMutation.isPending}
+          disabled={
+            confirmationRequired
+              ? verifyOtpMutation.isPending
+              : signUpMutation.isPending
+          } // -> 회원가입 성공 후 이메일 인증이 필요할 때 버튼 비활성화
+          loading={
+            confirmationRequired
+              ? verifyOtpMutation.isPending
+              : signUpMutation.isPending
+          }
           color="light-blue"
           className="w-full text-md py-1"
         >
-          {confirmationRequired ? "이메일을 확인해 주세요" : "회원가입"}
+          {confirmationRequired ? "인증하기" : "회원가입"}
         </Button>
       </div>
       <div className="py-4 w-full text-center max-w-lg border border-gray-400 bg-white">
