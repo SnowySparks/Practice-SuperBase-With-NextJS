@@ -3,20 +3,34 @@ import { Button } from "@material-tailwind/react";
 import Person from "./Person";
 import Message from "./Message";
 import { useEffect } from "react";
-import { useSelectedIndexState } from "utils/store/selectedIndexState";
+import {
+  useSelectedIndexStore,
+  useSelectedUserIdState,
+} from "utils/store/selectedUserIdStore";
+import { useQuery } from "@tanstack/react-query";
+import { getUserById } from "actions/chatAction";
 
 export default function ChatScreen() {
-  const { selectedIndex } = useSelectedIndexState();
-  return selectedIndex !== null ? (
+  const { selectedUserId } = useSelectedUserIdState();
+  const { selectedIndex } = useSelectedIndexStore();
+
+  const selectedUserQuery = useQuery({
+    queryKey: ["user", selectedUserId],
+    queryFn: async () => getUserById(selectedUserId),
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+
+  return selectedUserQuery.data ? (
     <div className="w-full h-screen flex flex-col">
       {/* Active 유저 영역 */}
       <Person
         index={selectedIndex}
         isActive={false}
-        name={"Lopun"}
+        name={selectedUserQuery.data?.email?.split("@")[0]}
         onChatScreen={true}
         onlineAt={new Date().toISOString()}
-        userId={"iasdonfiodasn"}
+        userId={selectedUserQuery.data?.id}
       />
       {/* 채팅 영역 */}
       <div className="w-full flex-1 flex flex-col p-4 gap-3">

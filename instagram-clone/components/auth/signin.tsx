@@ -19,7 +19,6 @@ export default function SignIn({ setView }) {
           : "http://localhost:3000/auth/callback",
       },
     });
-    console.log(data);
   }
 
   // 로그인과 관련된 Mutation

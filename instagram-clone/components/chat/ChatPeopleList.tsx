@@ -1,29 +1,49 @@
 "use client";
 import Person from "./Person";
-import { useSelectedIndexState } from "utils/store/selectedIndexState";
+import {
+  useSelectedIndexStore,
+  useSelectedUserIdState,
+} from "utils/store/selectedUserIdStore";
+import { useQuery } from "@tanstack/react-query";
+import { getAllUsers } from "actions/chatAction";
+import { User } from "node_modules/@supabase/auth-js/dist/module";
 
-export default function ChatPeopleList() {
-  const { selectedIndex, setSelectedIndexState } = useSelectedIndexState();
+interface ChatPeopleListProps {
+  loggedInUser?: User;
+}
+
+export default function ChatPeopleList({ loggedInUser }: ChatPeopleListProps) {
+  const { selectedUserId, setSelectedUserId } = useSelectedUserIdState();
+  const { selectedIndex, setSelectedIndex } = useSelectedIndexStore();
+
+  const getAllUserQuery = useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      console.log(process.env.NEXT_PUBLIC_SUPABASE_URL);
+      const allUser = await getAllUsers();
+      return allUser.filter((user) => user.id !== loggedInUser?.id);
+    },
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+
   return (
     <div className="h-screen min-w-60 flex flex-col bg-gray-50">
-      <Person
-        onClick={() => setSelectedIndexState(0)}
-        index={0}
-        isActive={selectedIndex === 0}
-        name={"Lopun"}
-        onChatScreen={false}
-        onlineAt={new Date().toISOString()}
-        userId={"iasdonfiodasn"}
-      />
-      <Person
-        onClick={() => setSelectedIndexState(1)}
-        index={1}
-        isActive={selectedIndex === 1}
-        name={"홍길동"}
-        onChatScreen={false}
-        onlineAt={new Date().toISOString()}
-        userId={"iasdonfiodasn"}
-      />
+      {getAllUserQuery.data?.map((user, index) => (
+        <Person
+          key={user.id}
+          onClick={() => {
+            setSelectedUserId(user.id);
+            setSelectedIndex(index);
+          }}
+          index={index}
+          isActive={selectedUserId === user.id}
+          name={user.email.split("@")[0]}
+          onChatScreen={false}
+          onlineAt={new Date().toISOString()}
+          userId={user.id}
+        />
+      ))}
     </div>
   );
 }

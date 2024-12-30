@@ -23,7 +23,6 @@ export default function SignUp({ setView }) {
           : "http://localhost:3000/auth/callback",
       },
     });
-    console.log(data);
   }
 
   // 회원가입과 관련된
