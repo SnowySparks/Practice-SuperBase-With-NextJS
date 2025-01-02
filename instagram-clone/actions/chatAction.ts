@@ -1,5 +1,6 @@
 "use server";
 
+import { Database } from "types_db";
 import {
   createServerSupabaseAdminClient,
   createServerSupabaseClient,
@@ -59,7 +60,11 @@ export async function sendMessage({
 }
 
 // 메세지 전부 받기
-export async function getAllMessages({ chatUserId }: { chatUserId: string }) {
+export async function getAllMessages({
+  chatUserId,
+}: {
+  chatUserId: string;
+}): Promise<Database["public"]["Tables"]["message"]["Row"][]> {
   const supabase = await createServerSupabaseClient();
   const {
     data: { session },
