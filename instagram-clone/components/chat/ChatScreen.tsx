@@ -33,7 +33,7 @@ export default function ChatScreen() {
         userId={selectedUserQuery.data?.id}
       />
       {/* 채팅 영역 */}
-      <div className="w-full flex-1 flex flex-col p-4 gap-3">
+      <div className="w-full overflow-y-scroll flex-1 flex flex-col p-4 gap-3">
         <Message isFromMe={true} message={"안녕하세요."} />
         <Message isFromMe={false} message={"반갑습니다."} />
         <Message isFromMe={true} message={"안녕하세요."} />
