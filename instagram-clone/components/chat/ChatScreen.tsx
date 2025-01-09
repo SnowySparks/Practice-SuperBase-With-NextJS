@@ -11,6 +11,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { getAllMessages, getUserById, sendMessage } from "actions/chatAction";
 import { Spinner } from "@material-tailwind/react";
 import { createBrowserSupabaseClient } from "utils/supabase/client";
+import { usePresenceStore } from "utils/store/presenseStore";
 
 export default function ChatScreen() {
   const { selectedUserId } = useSelectedUserIdState();
@@ -18,6 +19,7 @@ export default function ChatScreen() {
   const supabase = createBrowserSupabaseClient();
   const [message, setMessage] = useState("");
   const endMessageRef = useRef<HTMLDivElement | null>(null);
+  const { presence } = usePresenceStore();
 
   const selectedUserQuery = useQuery({
     queryKey: ["user", selectedUserId],
@@ -85,7 +87,7 @@ export default function ChatScreen() {
         isActive={false}
         name={selectedUserQuery.data?.email?.split("@")[0]}
         onChatScreen={true}
-        onlineAt={new Date().toISOString()}
+        onlineAt={presence?.[selectedUserId]?.[0]?.onlineAt}
         userId={selectedUserQuery.data?.id}
       />
       {/* 채팅 영역 */}
